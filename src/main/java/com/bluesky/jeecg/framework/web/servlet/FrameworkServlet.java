@@ -103,9 +103,6 @@ public class FrameworkServlet extends HttpServletBean {
         try {
             //初始化基于spring容器的上下文对象
             this.webApplicationContext = initWebApplicationContext();
-            Map<String, Object> str =(Map<String, Object> )webApplicationContext.getBeansWithAnnotation(Controller.class);
-            System.out.println(str.get("test").getClass().getAnnotations()[0].toString());
-
             initFrameworkServlet();
         }
         catch (ServletException ex) {
@@ -331,11 +328,20 @@ public class FrameworkServlet extends HttpServletBean {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);    //To change body of overridden methods use File | Settings | File Templates.
+        processRequest(req,resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);    //To change body of overridden methods use File | Settings | File Templates.
+        processRequest(req,resp);
     }
+    /**
+     * 处理请求方法
+     * 郭建林
+     * 2014年1月19日10:09:03
+     */
+    protected void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
+    }
+
 }
