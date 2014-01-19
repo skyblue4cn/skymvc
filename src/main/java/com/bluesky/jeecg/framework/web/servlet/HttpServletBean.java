@@ -3,11 +3,15 @@ package com.bluesky.jeecg.framework.web.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.*;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceEditor;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.ServletContextResourceLoader;
+import org.springframework.web.context.support.StandardServletEnvironment;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -28,6 +32,8 @@ public class HttpServletBean extends HttpServlet {
      * config parameters to this servlet.
      */
     private final Set<String> requiredProperties = new HashSet<String>();
+    //环境
+    private ConfigurableEnvironment environment;
     @Override
     public final void init() throws ServletException {
 
@@ -36,13 +42,16 @@ public class HttpServletBean extends HttpServlet {
         // 设置初始化参数中设置properties.
         try {
             PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
-            System.out.println("1");
+            BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
+            ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
+            bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
+            //把配置值注册到容器中，在子类可以通过setter获取
+            bw.setPropertyValues(pvs, true);
         }
         catch (BeansException ex) {
             logger.error("Failed to set bean properties on servlet '" + getServletName() + "'", ex);
             throw ex;
         }
-        // Let subclasses do whatever initialization they like.
         initServletBean();
             logger.info("Servlet '" + getServletName() + "' configured successfully");
 
@@ -53,19 +62,45 @@ public class HttpServletBean extends HttpServlet {
     protected final void addRequiredProperty(String property) {
         this.requiredProperties.add(property);
     }
-
     /**
-     * 模板方法声明
-     * Subclasses may override this to perform custom initialization.
-     * method is invoked.
-     * @throws ServletException if subclass initialization fails
+     * {@inheritDoc}
+     * @throws IllegalArgumentException if environment is not assignable to
+     * {@code ConfigurableEnvironment}.
      */
-    protected void initServletBean() throws ServletException {
-
+    public void setEnvironment(Environment environment) {
+        Assert.isInstanceOf(ConfigurableEnvironment.class, environment);
+        this.environment = (ConfigurableEnvironment) environment;
     }
 
     /**
+     * {@inheritDoc}
+     * <p>If {@code null}, a new environment will be initialized via
+     * {@link #createEnvironment()}.
+     */
+    public ConfigurableEnvironment getEnvironment() {
+        if (this.environment == null) {
+            this.environment = this.createEnvironment();
+        }
+        return this.environment;
+    }
+
+    /**
+     * Create and return a new {@link org.springframework.web.context.support.StandardServletEnvironment}. Subclasses may override
+     * in order to configure the environment or specialize the environment type returned.
+     */
+    protected ConfigurableEnvironment createEnvironment() {
+        return new StandardServletEnvironment();
+    }
+
+    /**
+     * 提供子类的扩展方法
+     * @throws ServletException
+     */
+    protected void initServletBean() throws ServletException {
+    }
+    /**
      * PropertyValues implementation created from ServletConfig init parameters.
+     * this code from spring mvc httpservletbean
      */
     private static class ServletConfigPropertyValues extends MutablePropertyValues {
 
@@ -101,4 +136,5 @@ public class HttpServletBean extends HttpServlet {
             }
         }
     }
+
 }
