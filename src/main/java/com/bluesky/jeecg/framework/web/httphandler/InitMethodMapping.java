@@ -1,7 +1,6 @@
 package com.bluesky.jeecg.framework.web.httphandler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
@@ -14,12 +13,14 @@ import java.util.*;
  * Date: 14-1-19
  * Time: 下午1:12
  */
-public class InitMethodMapping  extends AbstractHandlerMapping{
+public class InitMethodMapping  extends AbstractHandlerMapping implements InitializingBean {
+
+    public InitMethodMapping()
+    {
+    }
 
     //方法列表跟url对应
     private final Map<String, HandlerMethod> handlerMethods = new LinkedHashMap<String, HandlerMethod>();
-    /** Logger that is available to subclasses */
-    protected Logger logger = LoggerFactory.getLogger(getClass());
     /**
      * 初始化方法列表
      * 郭建林
@@ -40,7 +41,6 @@ public class InitMethodMapping  extends AbstractHandlerMapping{
      */
     @Override
     public HandlerMapping getHandler() {
-        initMethods();
         return this;
     }
 
@@ -65,7 +65,7 @@ public class InitMethodMapping  extends AbstractHandlerMapping{
             {
                  if(methodValue.getAnnotation(RequestMapping.class)!=null)
                  {
-                     handlerMethods.put(ControllerValue,new HandlerMethod(bean,methodValue));
+                     handlerMethods.put(ControllerValue,new HandlerMethod(beans.get(bean),methodValue));
 
                  }
             }
@@ -76,5 +76,12 @@ public class InitMethodMapping  extends AbstractHandlerMapping{
 
     public Map<String, HandlerMethod> getHandlerMethods() {
         return handlerMethods;
+    }
+
+    /**
+     * Detects handler methods at initialization.
+     */
+    public void afterPropertiesSet() {
+        initMethods();
     }
 }

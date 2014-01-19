@@ -29,9 +29,8 @@ public class DispatcherServlet extends FrameworkServlet {
     @Override
     protected void initFrameworkServlet() throws ServletException {
 
-        initHandlerMapping();
+       initHandlerMapping();
         initHandlerExecutionChain();
-        logger.info("");
     }
 
     /**
@@ -42,7 +41,7 @@ public class DispatcherServlet extends FrameworkServlet {
         try{
             logger.info("init all methods start!");
         Class<?> clazz = ClassUtils.forName("com.bluesky.jeecg.framework.web.httphandler.InitMethodMapping", DispatcherServlet.class.getClassLoader());
-        Object strategy = createDefaultStrategy(this.getWebApplicationContext(), clazz);
+         Object strategy = createDefaultStrategy(this.getWebApplicationContext(), clazz);
             handlerMapping= (HandlerMapping)strategy;
             logger.info("init all methods complete!");
         }
@@ -75,7 +74,7 @@ public class DispatcherServlet extends FrameworkServlet {
     }
     @Override
     protected void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        doDispatch(req,resp);
     }
 
 
@@ -88,6 +87,6 @@ public class DispatcherServlet extends FrameworkServlet {
      */
     private void doDispatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-
+              mappedHandler.ExecutionHandler(req,resp);
     }
 }
