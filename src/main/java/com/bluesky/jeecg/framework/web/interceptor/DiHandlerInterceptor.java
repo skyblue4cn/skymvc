@@ -1,7 +1,8 @@
 package com.bluesky.jeecg.framework.web.interceptor;
 
 import com.bluesky.jeecg.framework.web.servlet.HandlerExecutionChain;
-import com.bluesky.jeecg.framework.web.tools.Classes;
+import com.thoughtworks.paranamer.BytecodeReadingParanamer;
+import com.thoughtworks.paranamer.Paranamer;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +50,9 @@ public class DiHandlerInterceptor implements IHandlerInterceptor {
         if( handlerMethod!=null)
         {
         parameterObject=   handlerMethod.getMethod().getParameterTypes();
-            parameterNames= Classes.getMethodParamNames(handler.getClass(),handlerMethod.getMethod().getName()+"");
+            // 方法参数名
+            Paranamer paranamer = new BytecodeReadingParanamer();
+            parameterNames= paranamer.lookupParameterNames(handlerMethod.getMethod());
         }
        return parameterObject;
     }
