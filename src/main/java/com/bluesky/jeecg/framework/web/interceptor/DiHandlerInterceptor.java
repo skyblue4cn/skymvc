@@ -1,11 +1,10 @@
-package com.bluesky.jeecg.framework.web.servlet;
+package com.bluesky.jeecg.framework.web.interceptor;
 
-import org.springframework.util.ClassUtils;
+import com.bluesky.jeecg.framework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +29,7 @@ public class DiHandlerInterceptor implements IHandlerInterceptor {
 
         //获取参数
         getAllParameters(handlerMethod);
-        setValueforParameters(request, response);
+        setValueOfParameters(request, response);
         return true;
     }
 
@@ -56,7 +55,7 @@ public class DiHandlerInterceptor implements IHandlerInterceptor {
      *
      * */
 
-     private void setValueforParameters(HttpServletRequest request, HttpServletResponse response) throws Exception
+     private void setValueOfParameters(HttpServletRequest request, HttpServletResponse response) throws Exception
      {
          //页面的参数
          Map map=  request.getParameterMap();

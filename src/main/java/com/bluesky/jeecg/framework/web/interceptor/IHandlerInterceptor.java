@@ -1,4 +1,4 @@
-package com.bluesky.jeecg.framework.web.servlet;
+package com.bluesky.jeecg.framework.web.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
