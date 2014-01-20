@@ -4,13 +4,11 @@ import com.bluesky.jeecg.framework.web.httphandler.HandlerMapping;
 import com.bluesky.jeecg.framework.web.httphandler.InitMethodMapping;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ClassUtils;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.util.UrlPathHelper;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 /**
  * User: bluesky

@@ -30,6 +30,11 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-context:3.2.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:3.2.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context-support:3.2.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.aspectj:aspectjrt:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.aspectj:aspectjweaver:1.6.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: cglib:cglib:2.2.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: asm:asm:3.3.1" level="project" />
+    <orderEntry type="library" name="Maven: javassist:javassist:3.12.1.GA" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.slf4j:slf4j-log4j12:1.7.5" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
