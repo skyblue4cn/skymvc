@@ -5,6 +5,8 @@ import com.bluesky.jeecg.framework.web.httphandler.InitMethodMapping;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,6 +95,11 @@ public class DispatcherServlet extends FrameworkServlet {
         {
             //执行对象
             mappedHandler.ExecutionHandler(req, resp);
+
+           //时间问题暂时默认实现一种
+            RequestDispatcher dispatcher = req.getRequestDispatcher((String)req.getAttribute("URL"));
+
+            dispatcher .forward(req, resp);
         }catch (Exception e)
         {
             e.printStackTrace();

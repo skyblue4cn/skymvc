@@ -22,9 +22,10 @@ public class Test {
              * 2014年1月19日10:00:19
              */
              @RequestMapping(value="aaa",method = RequestMethod.GET)
-             public void Test(String username,HttpServletRequest req,UserEntity user)
+             public void Test(HttpServletRequest req,UserEntity user) //对参数只做了轻量级封装
              {
-                                    System.out.println("is ok");
+                 //设置跳转地址
+                 req.setAttribute("URL","/index.jsp");
              }
 
 }

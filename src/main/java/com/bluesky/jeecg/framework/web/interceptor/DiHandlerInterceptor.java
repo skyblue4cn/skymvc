@@ -3,13 +3,16 @@ package com.bluesky.jeecg.framework.web.interceptor;
 import com.bluesky.jeecg.framework.web.servlet.HandlerExecutionChain;
 import com.thoughtworks.paranamer.BytecodeReadingParanamer;
 import com.thoughtworks.paranamer.Paranamer;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: bluesky
@@ -17,8 +20,12 @@ import java.util.Map;
  * Time: 上午10:43
  */
 public class DiHandlerInterceptor implements IHandlerInterceptor {
+    //参数列表类型
         private Object[] parameterObject;
+    //参数名
     private String[] parameterNames;
+    //封装后的对象列表
+    Map<String,Object> ParametersValue;
     /**
      * 执行依赖转换
      * @param request
@@ -34,7 +41,9 @@ public class DiHandlerInterceptor implements IHandlerInterceptor {
         //获取参数
         getAllParameters(handlerMethod, handler);
         //给参数设置值
-        setValueOfParameters(request, response);
+        setValueOfParameters(request, response,handlerMethod);
+        //执行方法调用
+        InvokMethod(handlerMethod,((HandlerExecutionChain) handler).getApplicationContext().getBean(handlerMethod.getBeanType()));
         return true;
     }
 
@@ -63,12 +72,22 @@ public class DiHandlerInterceptor implements IHandlerInterceptor {
      *
      * */
 
-     private void setValueOfParameters(HttpServletRequest request, HttpServletResponse response) throws Exception
+     private void setValueOfParameters(HttpServletRequest request, HttpServletResponse response,Object handler) throws Exception
      {
          //页面的参数
-         Map map=  request.getParameterMap();
+         Map<String,Object> requestMap=  request.getParameterMap();
+         Map<String,Object> map =new HashMap<String, Object>();
+         //处理map的字符数组问题
+         Set<String> mapkey = requestMap.keySet();
+         for(String key:mapkey)
+         {
+             String temp=((String[])requestMap.get(key))[0];
+             map.put(key,temp);
+         }
+
+
          //封装后的对象列表
-         Map<String,Object> ParametersValue=new HashMap<String, Object>();
+          ParametersValue=new HashMap<String, Object>();
 
          int i=0;
          //循环参数列表
@@ -84,20 +103,49 @@ public class DiHandlerInterceptor implements IHandlerInterceptor {
               {
                   target=request;
                   ParametersValue.put(parameterNames[i],target);
+                  i++;
                   continue;
               }
               if ( val.equals("javax.servlet.http.HttpServletResponse"))
               {
                   target=response;
                   ParametersValue.put(parameterNames[i],target);
+                  i++;
                   continue;
               }
-              //如果是其他对象
-              ParametersValue.put(parameterNames[i], setValueOfSingeObject(map, target));
+                  ParametersValue.put(parameterNames[i], setValueOfSingeObject(map, target));
               i++;
            }
-         System.out.println();
+
+         /**给对象设置值*/
+
+
+
      }
+
+    /**
+     * 执行方法调用
+     * 郭建林
+     * 2014年1月21日14:52:39
+     * @return
+     */
+
+    private Object InvokMethod(HandlerMethod handlerMethod,Object handler) throws Exception
+    {
+
+        //初始化参数进行调用
+                 Object[] args= new Object[parameterNames.length];
+                  int i=0;
+                  for(String key:ParametersValue.keySet())
+                  {
+
+                      args[i]=ParametersValue.get(key);
+                      i++;
+                  }
+                 handlerMethod.getMethod().invoke(handler,args);
+                   return null;
+    }
+
     public Object[] getParameterObject() {
         return parameterObject;
     }
@@ -115,27 +163,44 @@ public class DiHandlerInterceptor implements IHandlerInterceptor {
      */
     public Object setValueOfSingeObject(Map<String,Object> keyValue,Object target)  throws Exception
     {
-
-        for(String key : keyValue.keySet())
-        {
-        if(!target.getClass().isPrimitive())
-        {
         // 调用getter方法获取属性值
         Method m = (Method) target.getClass().getMethod(
                 "getName");
         target.getClass().getName();
         String val = (String) m.invoke(target);
         target=Class.forName(val).newInstance();
-        if(target.getClass().getDeclaredFields().length>0)
+        //如果是其他对象
+        if (target instanceof String)
         {
-            target.getClass().getDeclaredFields()[0].getName();
-        }
-        }
-        else
+            target=target.toString();
+            return target;
+        }else if (target instanceof Integer)
         {
-            target=keyValue.get(key);
+            target=Integer.parseInt(target.toString());
+            return target;
         }
-        }
+        //如果页面提交的有值在进行注入
+        for(String key : keyValue.keySet())
+        {
+                //挨个给字段赋值
+                    if(target.getClass().getDeclaredFields().length>0)
+                    {
+                                for(Field field:target.getClass().getDeclaredFields())
+                                {
+                                    //如果数据不匹配就进行下一次循环
+                                    if(!field.getName().equals(key))continue;
+                                    try{
+                                    Method[] method = target.getClass().getMethods();
+                                    //设置值
+                                    Object[] args={keyValue.get(key)};
+                                       target.getClass().getDeclaredMethod("set" + StringUtils.capitalize(field.getName()),field.getType()).invoke(target,args);
+                                    }   catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                    }
+            }
          return target;
     }
 
