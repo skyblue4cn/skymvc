@@ -1,5 +1,6 @@
 package com.bluesky.jeecg.framework.web.tools;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.regex.Pattern;
@@ -107,4 +108,15 @@ public class ReflectHelper {
 		}
 		return value;
 	}
+    /**
+     * 初始化参数注解数组
+     * 郭建林
+     * 2014年1月24日17:04:36
+     */
+    public static Annotation[][] getparameterAnnotations(Method method)
+    {
+
+        Annotation[][] annotations=method.getParameterAnnotations();
+        return annotations;
+    }
 }

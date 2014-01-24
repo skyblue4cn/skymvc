@@ -68,7 +68,7 @@ public class HandlerExecutionChain extends AbstractHandlerMapping implements Han
                {
                    //方法注解信息
                    RequestMapping requestMapping=handlerMethodsMapping.get(key).getMethodAnnotation(RequestMapping.class);
-                      if(ControllerAndMethodStr[1].replace("/","").equals(requestMapping.value()[0]) )
+                      if(checkUrlIsMatch(requestMapping.value()[0],ControllerAndMethodStr[1]))
                       {
                    //是否采用对应的协议进行访问
                            if(req.getMethod().equals(requestMapping.method()[0].toString()))
@@ -155,6 +155,29 @@ public class HandlerExecutionChain extends AbstractHandlerMapping implements Han
     }
 
     /**
-     * 执行方法调用
-     */
+     * 检测提交的Url是否与控制器的方法匹配
+     * 郭建林
+     * 2014年1月24日14:23:34
+     * @param pathInController       控制器里的路径   /user/{userId}/queryType/id/{typeId}
+     * @param pathInReq              浏览器访问的地址 /user/13/queryType/id/12
+     * */
+    private boolean checkUrlIsMatch(String pathInController ,String pathInReq)
+    {
+        String pathInJava=new String(pathInController);
+        String   frontPath=new String(pathInReq);
+
+        pathInJava= pathInJava.replaceAll("\\{\\w*\\}","*");
+
+        String[] temp= pathInJava.split("\\*");
+        for(int i=0;i<temp.length;i++)
+        {
+            frontPath =frontPath.replace(temp[i],"");
+        }
+        if(frontPath.indexOf("/") ==-1)
+        {
+            return true;
+        }
+        return false;
+
+    }
 }

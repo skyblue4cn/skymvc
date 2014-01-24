@@ -102,8 +102,8 @@ public class DispatcherServlet extends FrameworkServlet {
             dispatcher .forward(req, resp);
         }catch (Exception e)
         {
-            RequestDispatcher dispatcher = req.getRequestDispatcher("/404/500.jsp");
-            e.printStackTrace();
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/404/404.jsp");
+            dispatcher .forward(req, resp);
         }
     }
 
